@@ -9,7 +9,8 @@ fn main() {
     let reader = BufReader::new(file);
 
     let mut grid: [[u32; 1000]; 1000] = [[0; 1000]; 1000];
-    let mut num_on_lights = 0;
+    // let mut num_on_lights = 0;
+    let mut total_brightness = 0;
 
     for line in reader.lines() {
         let string = line.unwrap();
@@ -41,29 +42,27 @@ fn main() {
             for yy in y_start..y_end + 1 {
                 // println!("X coord: {xx} Y coord: {yy}");
                 match instruction {
-                    "off" => grid[xx][yy] = 0,
-                    "on" => grid[xx][yy] = 1,
-                    "toggle" => {
-                        if grid[xx][yy] == 1 {
-                            grid[xx][yy] = 0;
-                        } else {
-                            grid[xx][yy] = 1;
-                        }
+                    "off" => if grid[xx][yy] > 0 {
+                        grid[xx][yy] -= 1;
                     },
+                    "on" => grid[xx][yy] += 1,
+                    "toggle" => grid[xx][yy] += 2,
                     _ => continue,
                 }
             }
         }
     }
 
-    for ii in 0..1000 {
-        for xx in 0..1000 {
-            if grid[ii][xx] == 1 {
-                num_on_lights += 1;
-            }
+    for xx in 0..1000 {
+        for yy in 0..1000 {
+            // if grid[xx][yy] == 1 {
+            //     num_on_lights += 1;
+            // }
+            total_brightness += grid[xx][yy];
         }
     }
 
     println!("");
-    println!("Lights found on: {num_on_lights}");
+    // println!("Lights found on: {num_on_lights}");
+    println!("Total brightness: {total_brightness}");
 }
