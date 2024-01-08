@@ -1,4 +1,11 @@
 use aoc_lib::*;
+use std::collections::HashSet;
+
+#[derive(Debug, PartialEq, Eq)]
+struct City {
+    name: String,
+    legs: Vec<Leg>,
+}
 
 #[derive(Debug, PartialEq, Eq)]
 struct Leg {
@@ -18,8 +25,16 @@ fn main() {
 
     let legs = create_legs(input);
 
-    for line in legs {
+    for line in &legs {
         println!("{:?}", line);
+    }
+
+    let unique_starting_points = create_unique_start_list(&legs);
+
+    let routes = create_routes(legs);
+
+    for route in routes {
+        println!("{:?}", route);
     }
 }
 
@@ -41,14 +56,15 @@ fn create_legs(input: Vec<String>) -> Vec<Leg> {
     legs
 }
 
-fn create_paths(input: Vec<Leg>) -> Vec<Route> {
+fn create_routes(input: Vec<Leg>) -> Vec<Route> {
     let mut routes = Vec::new();
 
+    // For each unique starting position
     for leg in input.as_slice() {
         let mut route = Route{ path: vec![leg.city_a.clone(), leg.city_b.clone()], distance: leg.distance };
 
         for other_leg in input.as_slice() {
-            if other_leg.city_a == route.path.last().unwrap().to_string() || other_leg.city_b == route.path.last().unwrap().to_string() && (!route.path.contains(other_leg.city_a) ){
+            if (other_leg.city_a == route.path.last().unwrap().to_string() || other_leg.city_b == route.path.last().unwrap().to_string()) && !route.path.contains(&other_leg.city_a){
                 route.path.push(other_leg.city_b.clone());
                 route.distance += other_leg.distance;
             }
@@ -60,65 +76,9 @@ fn create_paths(input: Vec<Leg>) -> Vec<Route> {
     routes
 }
 
-#[test]
-fn create_legs_vec() {
-    let input = vec![
-        "London to Dublin = 464".to_string(),
-        "London to Belfast = 518".to_string(),
-        "Dublin to Belfast = 141".to_string()
-    ];
-
-    let result = create_legs(input);
-
-    let expected = vec![
-        Leg{
-            city_a: "London".to_string(),
-            city_b: "Dublin".to_string(),
-            distance: 464
-        }, 
-        Leg{
-            city_a: "London".to_string(),
-            city_b: "Belfast".to_string(),
-            distance: 518
-        }, 
-        Leg{
-            city_a: "Dublin".to_string(),
-            city_b: "Belfast".to_string(),
-            distance: 141
-        }
-    ];
-
-    assert_eq!(result, expected)
+fn create_unique_start_list(input: &Vec<Leg>) -> Vec<String> {
+    
 }
 
-#[test]
-fn create_paths_vec() {
-    let input = vec![
-        Leg{
-            city_a: "London".to_string(),
-            city_b: "Dublin".to_string(),
-            distance: 464
-        }, 
-        Leg{
-            city_a: "London".to_string(),
-            city_b: "Belfast".to_string(),
-            distance: 518
-        }, 
-        Leg{
-            city_a: "Dublin".to_string(),
-            city_b: "Belfast".to_string(),
-            distance: 141
-        }
-    ];
-
-    let result = create_paths(input);
-
-    let expected = vec![
-        Route{
-            path: vec!["Dublin".to_string(), "London".to_string(), "Belfast".to_string()],
-            distance: 982
-        }
-    ];
-
-    assert_eq!(result, expected);
-}
+#[cfg(test)]
+mod test;
